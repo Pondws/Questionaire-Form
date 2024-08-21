@@ -9,7 +9,10 @@ import {
   Toolbar,
   CardContent,
   Typography,
-  Card
+  Card,
+  FormControl,
+  FormControlLabel,
+  RadioGroup
 } from '@mui/material';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -54,6 +57,10 @@ export default function Form() {
       ]
     }
   )
+
+  const [nameError, setNameError] = useState(false)
+  const [titleError, setTitleError] = useState(false)
+  const [descriptionError, setdDescriptionError] = useState(false)
 
   const handleAddQuestion = () => {
     // setFormData((prev) => {
@@ -150,8 +157,26 @@ export default function Form() {
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
         question.questionId === questionId
-          ? { ...question, title: e, options: [] }
+          ? { ...question, title: e }
           : question
+      )
+    }))
+  }
+
+  const handleCheckedChange = (questionId: number, choiceId: number) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: prevFormData.questions.map((question) =>
+        question.questionId === questionId
+          ? {
+            ...question,
+            choices: question.choices.map((choice) =>
+              choice.choiceId === choiceId
+                ? {
+                  ...choice, checked: true
+                } : choice
+            )
+          } : question
       )
     }))
   }
@@ -174,11 +199,33 @@ export default function Form() {
     }))
   }
 
-  const validationForm = () => {
+  const validateForm = () => {
+    if (!formData.name.trim() || "") {
+      setNameError(true)
+    } else {
+      setNameError(false)
+    }
+
+    formData.questions.forEach((question) => {
+      if (!question.title.trim() || "") {
+        setTitleError(true)
+      } else {
+        setTitleError(false)
+      }
+
+      question.choices.forEach((choice) => {
+        if (!choice.description.trim() || "") {
+          setdDescriptionError(true)
+        } else {
+          setdDescriptionError(false)
+        }
+      })
+    })
   }
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    validateForm()
     console.log(formData)
   }
 
@@ -197,7 +244,11 @@ export default function Form() {
             justifyContent: 'flex-end'
           }}
         >
-          <Button variant="outlined">CANCEL</Button>
+          <Button
+            variant="outlined"
+          >
+            CANCEL
+          </Button>
           <Button
             variant="outlined"
             sx={{
@@ -228,10 +279,11 @@ export default function Form() {
             sx={{
               my: 2
             }}
-            // value={formData.name}
+            value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            error={nameError ? true : false}
           />
-
+          {nameError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
         </CardContent>
 
         {formData.questions.map((question, index) => (
@@ -244,8 +296,11 @@ export default function Form() {
               variant="outlined"
               fullWidth
               name='question'
+              value={question.title}
               onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
+              error={titleError ? true : false}
             />
+            {titleError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
 
             {question.choices.map((choice) => (
               <Box
@@ -254,13 +309,13 @@ export default function Form() {
                   display: "flex",
                 }}
               >
-                <Radio
-                  // checked={selectedValue === 'a'}
-                  // onChange={handleChange}
-                  value="a"
-                // name={formData.questions}
-                // inputProps={{ 'aria-label': 'A' }}
-                />
+
+                <RadioGroup>
+                  <Radio
+                    name={question.title}
+                    onChange={() => handleCheckedChange(question.questionId, choice.choiceId)}
+                  />
+                </RadioGroup>
 
                 <Box
                   sx={{
@@ -275,16 +330,12 @@ export default function Form() {
                     sx={{
                       my: 2
                     }}
+                    value={choice.description}
                     onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
+                    error={descriptionError ? true : false}
                   />
-                  {/* <Typography>This answer is correct</Typography>
-                  <Typography
-                    sx={{
-                      color: 'error.main'
-                    }}
-                  >
-                    Please fill in this option
-                    </Typography> */}
+                  {/* <Typography>This answer is correct</Typography>*/}
+                  {descriptionError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
                 </Box>
 
                 <Button
@@ -337,6 +388,8 @@ export default function Form() {
         </CardActions>
 
       </Card>
+
     </Box >
+
   )
 }
