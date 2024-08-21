@@ -31,7 +31,7 @@ interface QuestionProp {
 }
 
 export default function Form() {
-  const [formData, setFormData] = useState(
+  const [formData, setFormData] = useState<FormDataProp>(
     {
       name: "",
       questions: [
@@ -62,50 +62,106 @@ export default function Form() {
   // };
 
   const handleAddQuestion = () => {
-    setFormData((prev) => {
-      const prevData = [...prev.questions]
-      const questionId = prevData.at(-1)
-      prevData.push({
-        questionId: questionId.questionId + 1,
-        title: "",
-        choices: [
-          {
-            choiceId: 1,
+    // setFormData((prev) => {
+    //   const prevData = [...prev.questions]
+    //   const questionId = prevData.at(-1)
+    //   prevData.push({
+    //     questionId: questionId.questionId + 1,
+    //     title: "",
+    //     choices: [
+    //       {
+    //         choiceId: 1,
+    //         checked: false,
+    //         description: "",
+    //       },
+    //     ]
+    //   })
+    //   return {
+    //     ...prev,
+    //     questions: prevData
+    //   }
+    // })
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      questions: [
+        ...prevFormData.questions,
+        {
+          questionId: prevFormData.questions.length + 1,
+          title: "",
+          choices: [{
             checked: false,
-            description: "",
+            choiceId: 1,
+            description: ""
           },
-        ]
-      })
-      return {
-        ...prev,
-        questions: prevData
-      }
-    })
+          {
+            checked: false,
+            choiceId: 2,
+            description: ""
+          }]
+        }
+      ]
+    }))
   };
 
   const handleDeleteQuesiton = (questionId: number) => {
-    for (let i = 0; i < formData.questions.length; i++) {
-      if (formData.questions[i].questionId === questionId) {
-        formData.questions.splice(i, 1);
-        break;
-      }
-    }
-    setFormData({ ...formData });
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: [
+        ...prevFormData.questions.filter((question) => question.questionId !== questionId)
+      ]
+    }))
   }
 
-  // const handleAddChoice = (choiceId: number) => {
-  //   setFormData(prevForm => )
-  // }
+  const handleAddChoice = (questionId: number) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: [
+        ...prevFormData.questions.map((question) =>
+          question.questionId === questionId
+            ? {
+              ...question,
+              choices: [
+                ...question.choices,
+                {
+                  checked: false,
+                  choiceId: question.choices.length + 1,
+                  description: ""
+                }
+              ]
+            } : question
+        )
+      ]
+    }))
+  }
 
-  // const handleDeleteChoice = (choiceId: number) => {
-  //   for (let i = 0; i < formData.questions.length; i++) {
-  //     if (formData.questions[i].choices.choiceId === choiceId) {
-  //       formData.questions.splice(i, 1);
-  //       break;
-  //     }
-  //   }
-  //   setFormData({ ...formData });
-  // }
+  const handleDeleteChoice = (questionId: number, choiceId: number) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: [
+        ...prevFormData.questions.map((question) =>
+          question.questionId === questionId
+            ? {
+              ...question,
+              choices: [
+                ...question.choices.filter((choice) => choice.choiceId !== choiceId)
+              ]
+            } : question
+        )
+      ]
+    }))
+  }
+
+  const handleNameChange = () => {
+    
+  }
+
+  const handleQuestionChange = () => {
+
+  }
+
+  const handleDescriptionChange = () => {
+
+  }
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
@@ -114,7 +170,6 @@ export default function Form() {
 
   return (
     <Box>
-      {/* <form onSubmit={handleSubmit}> */}
       <AppBar position="static"
         sx={{
           boxShadow: "none",
@@ -159,7 +214,8 @@ export default function Form() {
             sx={{
               my: 2
             }}
-
+            value={formData.name}
+            onChange={handleNameChange}
           />
         </CardContent>
 
@@ -173,9 +229,11 @@ export default function Form() {
               variant="outlined"
               fullWidth
               name='question'
+              value={formData.questions}
+              onChange={handleQuestionChange}
             />
 
-            {question.choices.map((choice, index) => (
+            {question.choices.map((choice) => (
               <Box
                 key={choice.choiceId}
                 sx={{
@@ -201,23 +259,25 @@ export default function Form() {
                     sx={{
                       my: 2
                     }}
+                    value={choice.description}
+                    onChange={handleDescriptionChange}
                   />
                 </Box>
 
-                <Button>
+                <Button
+                  onClick={() => handleDeleteChoice(question.questionId, choice.choiceId)}
+                >
                   <DeleteOutlineIcon />
                 </Button>
 
-
-                <Button
-                  onClick={() => handleAddChoice(question.questionId)}
-                >
-                  + ADD CHOICE
-                </Button>
               </Box>
             ))}
 
-
+            <Button
+              onClick={() => handleAddChoice(question.questionId)}
+            >
+              + ADD CHOICE
+            </Button>
 
             <hr />
 
@@ -232,7 +292,6 @@ export default function Form() {
               DELETE
             </Button>
           </CardContent>
-
         ))}
 
         <CardActions
@@ -255,7 +314,6 @@ export default function Form() {
         </CardActions>
 
       </Card>
-      {/* </form> */}
     </Box >
   )
 }
