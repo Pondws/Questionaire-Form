@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -54,12 +54,6 @@ export default function Form() {
       ]
     }
   )
-
-  // const handleNameChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-  //     setFormData({
-  //         name: e.target.value
-  //     })
-  // };
 
   const handleAddQuestion = () => {
     // setFormData((prev) => {
@@ -151,16 +145,36 @@ export default function Form() {
     }))
   }
 
-  const handleNameChange = () => {
-    
+  const handleQuestionChange = (questionId: number, e: any) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: prevFormData.questions.map((question) =>
+        question.questionId === questionId
+          ? { ...question, title: e, options: [] }
+          : question
+      )
+    }))
   }
 
-  const handleQuestionChange = () => {
-
+  const handleDescriptionChange = (questionId: number, choiceId: number, e: any) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: prevFormData.questions.map((question) =>
+        question.questionId === questionId
+          ? {
+            ...question,
+            choices: question.choices.map((choice) =>
+              choice.choiceId === choiceId
+                ? {
+                  ...choice, description: e
+                } : choice
+            )
+          } : question
+      )
+    }))
   }
 
-  const handleDescriptionChange = () => {
-
+  const validationForm = () => {
   }
 
   const handleSubmit = (e: any) => {
@@ -214,9 +228,10 @@ export default function Form() {
             sx={{
               my: 2
             }}
-            value={formData.name}
-            onChange={handleNameChange}
+            // value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+
         </CardContent>
 
         {formData.questions.map((question, index) => (
@@ -229,8 +244,7 @@ export default function Form() {
               variant="outlined"
               fullWidth
               name='question'
-              value={formData.questions}
-              onChange={handleQuestionChange}
+              onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
             />
 
             {question.choices.map((choice) => (
@@ -241,9 +255,11 @@ export default function Form() {
                 }}
               >
                 <Radio
+                  // checked={selectedValue === 'a'}
+                  // onChange={handleChange}
                   value="a"
-                  name="radio-buttons"
-                  inputProps={{ 'aria-label': 'A' }}
+                // name={formData.questions}
+                // inputProps={{ 'aria-label': 'A' }}
                 />
 
                 <Box
@@ -259,9 +275,16 @@ export default function Form() {
                     sx={{
                       my: 2
                     }}
-                    value={choice.description}
-                    onChange={handleDescriptionChange}
+                    onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
                   />
+                  {/* <Typography>This answer is correct</Typography>
+                  <Typography
+                    sx={{
+                      color: 'error.main'
+                    }}
+                  >
+                    Please fill in this option
+                    </Typography> */}
                 </Box>
 
                 <Button
