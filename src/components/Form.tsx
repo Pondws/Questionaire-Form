@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   RadioGroup
 } from '@mui/material';
+import { uuid } from 'uuidv4';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -23,12 +24,12 @@ interface FormDataProp {
   questions: QuestionProp[]
 }
 interface ChoicesProp {
-  choiceId: number,
+  choiceId: string,
   checked?: boolean,
   description: string
 }
 interface QuestionProp {
-  questionId: number,
+  questionId: string,
   title: string,
   choices: ChoicesProp[]
 }
@@ -39,16 +40,16 @@ export default function Form() {
       name: "",
       questions: [
         {
-          questionId: 1,
+          questionId: uuid(),
           title: "",
           choices: [
             {
-              choiceId: 1,
+              choiceId: uuid(),
               checked: false,
               description: "",
             },
             {
-              choiceId: 2,
+              choiceId: uuid(),
               checked: false,
               description: "",
             },
@@ -87,16 +88,16 @@ export default function Form() {
       questions: [
         ...prevFormData.questions,
         {
-          questionId: prevFormData.questions.length + 1,
+          questionId: uuid(),
           title: "",
           choices: [{
             checked: false,
-            choiceId: 1,
+            choiceId: uuid(),
             description: ""
           },
           {
             checked: false,
-            choiceId: 2,
+            choiceId: uuid(),
             description: ""
           }]
         }
@@ -104,7 +105,7 @@ export default function Form() {
     }))
   };
 
-  const handleDeleteQuesiton = (questionId: number) => {
+  const handleDeleteQuesiton = (questionId: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -113,7 +114,7 @@ export default function Form() {
     }))
   }
 
-  const handleAddChoice = (questionId: number) => {
+  const handleAddChoice = (questionId: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -125,7 +126,7 @@ export default function Form() {
                 ...question.choices,
                 {
                   checked: false,
-                  choiceId: question.choices.length + 1,
+                  choiceId: uuid(),
                   description: ""
                 }
               ]
@@ -135,7 +136,7 @@ export default function Form() {
     }))
   }
 
-  const handleDeleteChoice = (questionId: number, choiceId: number) => {
+  const handleDeleteChoice = (questionId: string, choiceId: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -152,7 +153,7 @@ export default function Form() {
     }))
   }
 
-  const handleQuestionChange = (questionId: number, e: any) => {
+  const handleQuestionChange = (questionId: string, e: any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
@@ -163,25 +164,25 @@ export default function Form() {
     }))
   }
 
-  const handleCheckedChange = (questionId: number, choiceId: number) => {
+  const handleCheckedChange = (questionId: string, choiceId: string) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
         question.questionId === questionId
           ? {
             ...question,
-            choices: question.choices.map((choice) =>
-              choice.choiceId === choiceId
-                ? {
-                  ...choice, checked: true
-                } : choice
-            )
+            // choices: question.choices.map((choice) =>
+            //   choice.choiceId === choiceId
+            //     ? {
+            //       ...choice, checked: true,
+            //     } : { ...choice, checked: false}
+            // )
           } : question
       )
     }))
   }
 
-  const handleDescriptionChange = (questionId: number, choiceId: number, e: any) => {
+  const handleDescriptionChange = (questionId: string, choiceId: string, e: any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
@@ -196,6 +197,21 @@ export default function Form() {
             )
           } : question
       )
+    }))
+  }
+
+  const handleCopyQuestion = (questionId: string) => {
+    const copiedQuestion = {
+      ...formData.questions.find((question) => question.questionId === questionId)
+    };
+    
+    setFormData((prevFormData: any) => ({
+      ...prevFormData,
+      
+      questions: [
+        ...prevFormData.questions,
+        copiedQuestion
+      ]
     }))
   }
 
@@ -302,51 +318,52 @@ export default function Form() {
             />
             {titleError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
 
-            {question.choices.map((choice) => (
-              <Box
-                key={choice.choiceId}
-                sx={{
-                  display: "flex",
-                }}
-              >
-
-                <RadioGroup>
-                  <Radio
-                    name={question.title}
-                    onChange={() => handleCheckedChange(question.questionId, choice.choiceId)}
-                  />
-                </RadioGroup>
-
+            <RadioGroup>
+              {question.choices.map((choice) => (
                 <Box
+                  key={choice.choiceId}
                   sx={{
-                    width: "100%"
+                    display: "flex",
                   }}
                 >
-                  <TextField
-                    label="Description*"
-                    variant="outlined"
-                    fullWidth
-                    name='description'
-                    sx={{
-                      my: 2
-                    }}
-                    value={choice.description}
-                    onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
-                    error={descriptionError ? true : false}
+
+                  <Radio
+                    // name={`${question.questionId}`}
+                    // checked={choice.checked}
+                    value={choice.checked}
+                    onChange={() => handleCheckedChange(question.questionId, choice.choiceId)}
                   />
-                  {/* <Typography>This answer is correct</Typography>*/}
-                  {descriptionError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
+
+                  <Box
+                    sx={{
+                      width: "100%"
+                    }}
+                  >
+                    <TextField
+                      label="Description*"
+                      variant="outlined"
+                      fullWidth
+                      name='description'
+                      sx={{
+                        my: 2
+                      }}
+                      value={choice.description}
+                      onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
+                      error={descriptionError ? true : false}
+                    />
+                    {/* <Typography>This answer is correct</Typography>*/}
+                    {descriptionError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
+                  </Box>
+
+                  <Button
+                    onClick={() => handleDeleteChoice(question.questionId, choice.choiceId)}
+                  >
+                    <DeleteOutlineIcon />
+                  </Button>
+
                 </Box>
-
-                <Button
-                  onClick={() => handleDeleteChoice(question.questionId, choice.choiceId)}
-                >
-                  <DeleteOutlineIcon />
-                </Button>
-
-              </Box>
-            ))}
-
+              ))}
+            </RadioGroup>
             <Button
               onClick={() => handleAddChoice(question.questionId)}
             >
@@ -355,7 +372,9 @@ export default function Form() {
 
             <hr />
 
-            <Button>
+            <Button
+              onClick={() => handleCopyQuestion(question.questionId)}
+            >
               <ContentCopyIcon />
               DUPLICATE
             </Button>
@@ -388,7 +407,6 @@ export default function Form() {
         </CardActions>
 
       </Card>
-
     </Box >
 
   )
