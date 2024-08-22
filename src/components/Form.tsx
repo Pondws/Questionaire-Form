@@ -10,8 +10,6 @@ import {
   CardContent,
   Typography,
   Card,
-  FormControl,
-  FormControlLabel,
   RadioGroup
 } from '@mui/material';
 import { uuid } from 'uuidv4';
@@ -171,12 +169,12 @@ export default function Form() {
         question.questionId === questionId
           ? {
             ...question,
-            // choices: question.choices.map((choice) =>
-            //   choice.choiceId === choiceId
-            //     ? {
-            //       ...choice, checked: true,
-            //     } : { ...choice, checked: false}
-            // )
+            choices: question.choices.map((choice) =>
+              choice.choiceId === choiceId
+                ? {
+                  ...choice, checked: true,
+                } : { ...choice, checked: false }
+            )
           } : question
       )
     }))
@@ -204,10 +202,10 @@ export default function Form() {
     const copiedQuestion = {
       ...formData.questions.find((question) => question.questionId === questionId)
     };
-    
+
     setFormData((prevFormData: any) => ({
       ...prevFormData,
-      
+
       questions: [
         ...prevFormData.questions,
         copiedQuestion
@@ -328,8 +326,8 @@ export default function Form() {
                 >
 
                   <Radio
-                    // name={`${question.questionId}`}
-                    // checked={choice.checked}
+                    name={question.title}
+                    checked={choice.checked}
                     value={choice.checked}
                     onChange={() => handleCheckedChange(question.questionId, choice.choiceId)}
                   />
@@ -351,7 +349,7 @@ export default function Form() {
                       onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
                       error={descriptionError ? true : false}
                     />
-                    {/* <Typography>This answer is correct</Typography>*/}
+                    {choice.checked ? <Typography>This answer is correct</Typography> : ""}
                     {descriptionError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
                   </Box>
 
