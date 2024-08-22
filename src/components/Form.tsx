@@ -10,24 +10,26 @@ import {
   CardContent,
   Typography,
   Card,
-  RadioGroup
+  RadioGroup,
+  Divider
 } from '@mui/material';
-import { uuid } from 'uuidv4';
 
+// icon
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import AddIcon from '@mui/icons-material/Add';
 
 interface FormDataProp {
   name: string,
   questions: QuestionProp[]
 }
 interface ChoicesProp {
-  choiceId: string,
-  checked?: boolean,
+  choiceId: number,
+  checked: boolean,
   description: string
 }
 interface QuestionProp {
-  questionId: string,
+  questionId: number,
   title: string,
   choices: ChoicesProp[]
 }
@@ -38,16 +40,16 @@ export default function Form() {
       name: "",
       questions: [
         {
-          questionId: uuid(),
+          questionId: Math.random(),
           title: "",
           choices: [
             {
-              choiceId: uuid(),
+              choiceId: Math.random(),
               checked: false,
               description: "",
             },
             {
-              choiceId: uuid(),
+              choiceId: Math.random(),
               checked: false,
               description: "",
             },
@@ -57,9 +59,7 @@ export default function Form() {
     }
   )
 
-  const [nameError, setNameError] = useState(false)
-  const [titleError, setTitleError] = useState(false)
-  const [descriptionError, setdDescriptionError] = useState(false)
+  const [error, setError] = useState(false)
 
   const handleAddQuestion = () => {
     // setFormData((prev) => {
@@ -86,16 +86,16 @@ export default function Form() {
       questions: [
         ...prevFormData.questions,
         {
-          questionId: uuid(),
+          questionId: Math.random(),
           title: "",
           choices: [{
             checked: false,
-            choiceId: uuid(),
+            choiceId: Math.random(),
             description: ""
           },
           {
             checked: false,
-            choiceId: uuid(),
+            choiceId: Math.random(),
             description: ""
           }]
         }
@@ -103,7 +103,7 @@ export default function Form() {
     }))
   };
 
-  const handleDeleteQuesiton = (questionId: string) => {
+  const handleDeleteQuestion = (questionId: number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -112,7 +112,7 @@ export default function Form() {
     }))
   }
 
-  const handleAddChoice = (questionId: string) => {
+  const handleAddChoice = (questionId: number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -124,7 +124,7 @@ export default function Form() {
                 ...question.choices,
                 {
                   checked: false,
-                  choiceId: uuid(),
+                  choiceId: Math.random(),
                   description: ""
                 }
               ]
@@ -134,7 +134,7 @@ export default function Form() {
     }))
   }
 
-  const handleDeleteChoice = (questionId: string, choiceId: string) => {
+  const handleDeleteChoice = (questionId: number, choiceId: number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
@@ -151,7 +151,7 @@ export default function Form() {
     }))
   }
 
-  const handleQuestionChange = (questionId: string, e: any) => {
+  const handleQuestionChange = (questionId: number, e: any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
@@ -162,7 +162,7 @@ export default function Form() {
     }))
   }
 
-  const handleCheckedChange = (questionId: string, choiceId: string) => {
+  const handleCheckedChange = (questionId: number, choiceId: number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
@@ -180,7 +180,7 @@ export default function Form() {
     }))
   }
 
-  const handleDescriptionChange = (questionId: string, choiceId: string, e: any) => {
+  const handleDescriptionChange = (questionId: number, choiceId: number, e: any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       questions: prevFormData.questions.map((question) =>
@@ -198,14 +198,14 @@ export default function Form() {
     }))
   }
 
-  const handleCopyQuestion = (questionId: string) => {
+  const handleCopyQuestion = (questionId: number) => {
     const copiedQuestion = {
       ...formData.questions.find((question) => question.questionId === questionId)
     };
 
+    copiedQuestion.questionId = Math.random()
     setFormData((prevFormData: any) => ({
       ...prevFormData,
-
       questions: [
         ...prevFormData.questions,
         copiedQuestion
@@ -213,34 +213,63 @@ export default function Form() {
     }))
   }
 
+  const handleResetForm = () => {
+    setFormData({
+      name: "",
+      questions: [
+        {
+          questionId: Math.random(),
+          title: "",
+          choices: [
+            {
+              choiceId: Math.random(),
+              checked: false,
+              description: "",
+            },
+            {
+              choiceId: Math.random(),
+              checked: false,
+              description: "",
+            },
+          ]
+        }
+      ]
+    })
+  }
+
   const validateForm = () => {
-    if (!formData.name.trim() || "") {
-      setNameError(true)
+    if (formData.name.trim() === "") {
+      setError(true)
+      return
     } else {
-      setNameError(false)
+      setError(false)
     }
 
-    formData.questions.forEach((question) => {
-      if (!question.title.trim() || "") {
-        setTitleError(true)
+    formData.questions.map((question) => {
+      if (question.title.trim() === "") {
+        setError(true)
       } else {
-        setTitleError(false)
+        setError(false)
       }
 
-      question.choices.forEach((choice) => {
-        if (!choice.description.trim() || "") {
-          setdDescriptionError(true)
+      question.choices.map((choice) => {
+        if (choice.description.trim() === "") {
+          setError(true)
         } else {
-          setdDescriptionError(false)
+          setError(false)
         }
       })
     })
+
   }
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
     validateForm()
-    console.log(formData)
+    console.log('formData: ', formData)
+    if (!error) {
+      
+    }
   }
 
   return (
@@ -259,7 +288,15 @@ export default function Form() {
           }}
         >
           <Button
+            sx={{
+              borderColor: "#FF5C00",
+              color: "#FF5C00",
+              '&:hover': {
+                borderColor: "#FF5C00",
+              },
+            }}
             variant="outlined"
+            onClick={handleResetForm}
           >
             CANCEL
           </Button>
@@ -267,9 +304,14 @@ export default function Form() {
             variant="outlined"
             sx={{
               backgroundColor: "#FF5C00",
+              color: "#fff",
               ml: 1,
               width: 180,
-              border: "none"
+              border: "none",
+              '&:hover': {
+                borderColor: "#FF5C00",
+                color: "#FF5C00"
+              },
             }}
             type='submit'
             onClick={handleSubmit}
@@ -280,41 +322,57 @@ export default function Form() {
       </AppBar>
 
       <Card sx={{ m: 3 }}>
-        <CardContent
-          sx={{
-            borderBottom: "1px solid #c2c2c2",
-          }}
-        >
-          <Typography>Questionnaire Detail</Typography>
-          <TextField
-            label="Name*"
-            variant="outlined"
-            fullWidth
-            sx={{
-              my: 2
-            }}
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            error={nameError ? true : false}
-          />
-          {nameError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
+        <CardContent>
+          <Box>
+            <Typography component={"h6"} sx={{
+              fontWeight: "400",
+              fontSize: "20px",
+              mb: 2
+            }}>
+              Questionnaire Detail
+            </Typography>
+            <TextField
+              label="Name*"
+              variant="outlined"
+              fullWidth
+              InputProps={{ sx: { borderRadius: 2 } }}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              error={error ? true : false}
+            />
+          </Box>
+          {/* {nameError && <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography>} */}
+          {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
         </CardContent>
 
         {formData.questions.map((question, index) => (
           <CardContent
+            sx={{
+              borderTop: "1px solid #c2c2c2",
+            }}
             key={question.questionId}
           >
-            <Typography>Question {index + 1}</Typography>
-            <TextField
-              label="Question*"
-              variant="outlined"
-              fullWidth
-              name='question'
-              value={question.title}
-              onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
-              error={titleError ? true : false}
-            />
-            {titleError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
+            <Typography component={"h6"} sx={{
+              fontWeight: "400",
+              fontSize: "20px",
+              pb: 2
+            }}>
+              Question {index + 1}
+            </Typography>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                label="Question*"
+                variant="outlined"
+                fullWidth
+                name='question'
+                value={question.title}
+                InputProps={{ sx: { borderRadius: 2 } }}
+                onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
+                error={error ? true : false}
+              />
+              {/* {titleError ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
+              {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+            </Box>
 
             <RadioGroup>
               {question.choices.map((choice) => (
@@ -334,7 +392,8 @@ export default function Form() {
 
                   <Box
                     sx={{
-                      width: "100%"
+                      width: "100%",
+                      my: 1
                     }}
                   >
                     <TextField
@@ -342,18 +401,28 @@ export default function Form() {
                       variant="outlined"
                       fullWidth
                       name='description'
-                      sx={{
-                        my: 2
-                      }}
                       value={choice.description}
+                      InputProps={{ sx: { borderRadius: 2 } }}
                       onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
-                      error={descriptionError ? true : false}
+                      error={error ? true : false}
                     />
-                    {choice.checked ? <Typography>This answer is correct</Typography> : ""}
-                    {descriptionError && <Typography sx={{ color: 'error.main' }}>Please fill in this option</Typography>}
+                    {choice.checked
+                      ? <Typography sx={{
+                        fontSize: "12px"
+                      }}>
+                        This answer is correct
+                      </Typography>
+                      : ""
+                    }
+                    {/* {descriptionError ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography>: ""} */}
+                    {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
                   </Box>
 
                   <Button
+                    sx={{
+                      color: "#00040C",
+                      p: 0
+                    }}
                     onClick={() => handleDeleteChoice(question.questionId, choice.choiceId)}
                   >
                     <DeleteOutlineIcon />
@@ -363,25 +432,60 @@ export default function Form() {
               ))}
             </RadioGroup>
             <Button
+              sx={{
+                p: 0,
+                fontSize: 14,
+                color: "#FF5C00",
+                my: 2
+              }}
               onClick={() => handleAddChoice(question.questionId)}
             >
-              + ADD CHOICE
+              <AddIcon />
+              <Typography sx={{
+                ml: 1
+              }}>
+                ADD CHOICE
+              </Typography>
+
             </Button>
 
-            <hr />
+            <Divider sx={{ backgroundColor: "#C2C9D1" }} />
 
-            <Button
-              onClick={() => handleCopyQuestion(question.questionId)}
+            <Box
+              sx={{
+                mt: 2
+              }}
             >
-              <ContentCopyIcon />
-              DUPLICATE
-            </Button>
-            <Button
-              onClick={() => handleDeleteQuesiton(question.questionId)}
-            >
-              <DeleteOutlineIcon />
-              DELETE
-            </Button>
+              <Button sx={{
+                color: "#00040C",
+                p: 0
+              }}
+                onClick={() => handleCopyQuestion(question.questionId)}
+              >
+                <ContentCopyIcon />
+                <Typography sx={{
+                  ml: 1
+                }}>
+                  DUPLICATE
+                </Typography>
+
+              </Button>
+              <Button sx={{
+                color: "#00040C",
+                p: 0,
+                ml: 2
+              }}
+                onClick={() => handleDeleteQuestion(question.questionId)}
+              >
+                <DeleteOutlineIcon />
+                <Typography sx={{
+                  ml: 1
+                }}>
+                  DELETE
+                </Typography>
+
+              </Button>
+            </Box>
           </CardContent>
         ))}
 
@@ -396,14 +500,23 @@ export default function Form() {
             fullWidth
             sx={{
               height: 48,
-              borderRadius: 2
+              borderRadius: 2,
+              borderColor: "#FF5C00",
+              color: "#FF5C00",
+              '&:hover': {
+                borderColor: "#FF5C00",
+              },
             }}
             onClick={handleAddQuestion}
           >
-            + ADD QUESTION
+            <AddIcon />
+            <Typography sx={{
+              pr: 2
+            }}>
+              ADD QUESTION
+            </Typography>
           </Button>
         </CardActions>
-
       </Card>
     </Box >
 

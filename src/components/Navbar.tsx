@@ -3,14 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Prompt } from 'next/font/google'
-
-const prompt = Prompt({
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
-  subsets: ['latin'],
-  display: 'swap',
-})
 
 export default function Navbar() {
   return (
@@ -32,7 +24,6 @@ export default function Navbar() {
             sx={{
               fontSize: 24,
             }}
-            className={prompt.className}
           >
             🦊 Foxbith Questionnaire
           </Typography>
