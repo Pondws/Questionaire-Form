@@ -21,37 +21,44 @@ import AddIcon from '@mui/icons-material/Add';
 
 interface FormDataProp {
   name: string,
+  errors: boolean,
   questions: QuestionProp[]
 }
 interface ChoicesProp {
   choiceId: number,
   checked: boolean,
   description: string
+  errors: boolean
 }
 interface QuestionProp {
   questionId: number,
   title: string,
-  choices: ChoicesProp[]
+  choices: ChoicesProp[],
+  errors: boolean
 }
 
 export default function Form() {
   const [formData, setFormData] = useState<FormDataProp>(
     {
       name: "",
+      errors: false,
       questions: [
         {
           questionId: Math.random(),
           title: "",
+          errors: false,
           choices: [
             {
               choiceId: Math.random(),
               checked: false,
               description: "",
+              errors: false,
             },
             {
               choiceId: Math.random(),
               checked: false,
               description: "",
+              errors: false,
             },
           ]
         }
@@ -59,7 +66,9 @@ export default function Form() {
     }
   )
 
-  const [error, setError] = useState(false)
+  // const [nameError, setNameError] = useState(false)
+  // const [titleError, setTitleError] = useState(false)
+  // const [descriptionError, setDescriptionError] = useState(false)
 
   const handleAddQuestion = () => {
     // setFormData((prev) => {
@@ -88,15 +97,18 @@ export default function Form() {
         {
           questionId: Math.random(),
           title: "",
+          errors: false,
           choices: [{
             checked: false,
             choiceId: Math.random(),
-            description: ""
+            description: "",
+            errors: false,
           },
           {
             checked: false,
             choiceId: Math.random(),
-            description: ""
+            description: "",
+            errors: false,
           }]
         }
       ]
@@ -125,7 +137,8 @@ export default function Form() {
                 {
                   checked: false,
                   choiceId: Math.random(),
-                  description: ""
+                  description: "",
+                  errors: false,
                 }
               ]
             } : question
@@ -216,20 +229,24 @@ export default function Form() {
   const handleResetForm = () => {
     setFormData({
       name: "",
+      errors: false,
       questions: [
         {
           questionId: Math.random(),
           title: "",
+          errors: false,
           choices: [
             {
               choiceId: Math.random(),
               checked: false,
               description: "",
+              errors: false,
             },
             {
               choiceId: Math.random(),
               checked: false,
               description: "",
+              errors: false,
             },
           ]
         }
@@ -238,42 +255,47 @@ export default function Form() {
   }
 
   const validateForm = () => {
-    if (formData.name.trim() === "") {
-      setError(true)
-      return
-    } else {
-      setError(false)
-    }
+    const formIsValid = false;
+    // if (formData.name.trim() === "") {
+    //   setFormData(true)
+    // } else {
+    //   setFormData(false)
+    // }
 
-    formData.questions.map((question) => {
-      if (question.title.trim() === "") {
-        setError(true)
-      } else {
-        setError(false)
-      }
+    // question.choices.map((choice, index) => {
+    //   if (choice.description.trim() === "") {
+    //     setFormData(true)
+    //   } else {
+    //     setFormData(false)
+    //   }
+    // })
 
-      question.choices.map((choice) => {
-        if (choice.description.trim() === "") {
-          setError(true)
-        } else {
-          setError(false)
-        }
-      })
-    })
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      questions: prevFormData.questions.map((question) =>
+        question.title.trim() === ""
+          ? {
+            ...question,
+            choices: question.choices.map((choice) =>
+              choice.description.trim() === ""
+                ? {
+                  ...choice, errors: true,
+                } : { ...choice, errors: false }
+            )
+          } : question
+      )
+    }))
+}
 
-  }
+const handleSubmit = (e: any) => {
+  e.preventDefault()
+  validateForm()
+  console.log('formData: ', formData)
+}
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
-    validateForm()
-    console.log('formData: ', formData)
-    if (!error) {
-      
-    }
-  }
-
-  return (
-    <Box>
+return (
+  <Box>
+    <form onSubmit={handleSubmit}>
       <AppBar position="static"
         sx={{
           boxShadow: "none",
@@ -301,7 +323,6 @@ export default function Form() {
             CANCEL
           </Button>
           <Button
-            variant="outlined"
             sx={{
               backgroundColor: "#FF5C00",
               color: "#fff",
@@ -309,12 +330,12 @@ export default function Form() {
               width: 180,
               border: "none",
               '&:hover': {
-                borderColor: "#FF5C00",
-                color: "#FF5C00"
+                borderColor: "#FF5C10",
+                color: "#fff",
+                backgroundColor: "#db4d00",
               },
             }}
             type='submit'
-            onClick={handleSubmit}
           >
             SAVE
           </Button>
@@ -333,16 +354,15 @@ export default function Form() {
             </Typography>
             <TextField
               label="Name*"
-              variant="outlined"
               fullWidth
               InputProps={{ sx: { borderRadius: 2 } }}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              error={error ? true : false}
+              error={formData.errors ? true : false}
             />
           </Box>
-          {/* {nameError && <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography>} */}
-          {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+          {formData.errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+          {/* {errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
         </CardContent>
 
         {formData.questions.map((question, index) => (
@@ -359,19 +379,20 @@ export default function Form() {
             }}>
               Question {index + 1}
             </Typography>
+
             <Box sx={{ mb: 2 }}>
               <TextField
                 label="Question*"
-                variant="outlined"
                 fullWidth
                 name='question'
                 value={question.title}
                 InputProps={{ sx: { borderRadius: 2 } }}
                 onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
-                error={error ? true : false}
+                error={question.errors ? true : false}
               />
-              {/* {titleError ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
-              {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+              {question.errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+              {/* {question.title === "" ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
+              {/* {errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
             </Box>
 
             <RadioGroup>
@@ -384,6 +405,9 @@ export default function Form() {
                 >
 
                   <Radio
+                    sx={{
+                      color: "#00040C"
+                    }}
                     name={question.title}
                     checked={choice.checked}
                     value={choice.checked}
@@ -398,13 +422,12 @@ export default function Form() {
                   >
                     <TextField
                       label="Description*"
-                      variant="outlined"
                       fullWidth
                       name='description'
                       value={choice.description}
                       InputProps={{ sx: { borderRadius: 2 } }}
                       onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
-                      error={error ? true : false}
+                      error={choice.errors ? true : false}
                     />
                     {choice.checked
                       ? <Typography sx={{
@@ -414,8 +437,8 @@ export default function Form() {
                       </Typography>
                       : ""
                     }
-                    {/* {descriptionError ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography>: ""} */}
-                    {error ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+                    {choice.errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+                    {/* {errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""} */}
                   </Box>
 
                   <Button
@@ -518,7 +541,7 @@ export default function Form() {
           </Button>
         </CardActions>
       </Card>
-    </Box >
-
-  )
+    </form>
+  </Box >
+)
 }
