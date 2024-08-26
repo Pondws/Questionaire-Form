@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -38,7 +38,6 @@ interface QuestionProp {
   errors: boolean
 }
 
-
 export default function Form() {
   const [formData, setFormData] = useState<FormDataProp>(
     {
@@ -68,26 +67,11 @@ export default function Form() {
     }
   )
 
+  useEffect(() => {
+    console.log("form Data: ", formData)
+  }, [formData])
+
   const handleAddQuestion = () => {
-    // setFormData((prev) => {
-    //   const prevData = [...prev.questions]
-    //   const questionId = prevData.at(-1)
-    //   prevData.push({
-    //     questionId: questionId.questionId + 1,
-    //     title: "",
-    //     choices: [
-    //       {
-    //         choiceId: 1,
-    //         checked: false,
-    //         description: "",
-    //       },
-    //     ]
-    //   })
-    //   return {
-    //     ...prev,
-    //     questions: prevData
-    //   }
-    // })
     setFormData(prevFormData => ({
       ...prevFormData,
       questions: [
@@ -278,14 +262,13 @@ export default function Form() {
         ...prevFormData,
         errors: nameEmpty,
         questions: updatedQuestions
-      };
+      }
     });
   };
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
     validateForm()
-    console.log('formData: ', formData)
   }
 
   return (
@@ -354,7 +337,10 @@ export default function Form() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 error={formData.errors ? true : false}
-                helperText={formData.errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+                helperText={formData.errors
+                  ? "Please fill in this option"
+                  : ""
+                }
               />
             </Box>
           </CardContent>
@@ -383,7 +369,10 @@ export default function Form() {
                   InputProps={{ sx: { borderRadius: 2 } }}
                   onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
                   error={question.errors ? true : false}
-                  helperText={question.errors ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography> : ""}
+                  helperText={question.errors
+                    ? "Please fill in this option"
+                    : ""
+                  }
                 />
               </Box>
 
@@ -427,7 +416,7 @@ export default function Form() {
                         onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
                         error={choice.errors ? true : false}
                         helperText={choice.errors
-                          ? <Typography sx={{ color: 'error.main', fontSize: 12 }}>Please fill in this option</Typography>
+                          ? "Please fill in this option"
                           : ""
                         }
                       />
