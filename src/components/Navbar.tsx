@@ -10,7 +10,6 @@ export default function Navbar() {
       <AppBar position="static"
         sx={{
           color: "#000",
-          fontSize: 24,
           boxShadow: "none",
         }}
       >
