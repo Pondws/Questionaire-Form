@@ -22,39 +22,39 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 interface FormDataProp {
   name: string,
-  errors: boolean,
+  error: boolean,
   questions: QuestionProp[]
 }
 interface ChoicesProp {
   checked: boolean,
   description: string
-  errors: boolean
+  error: boolean
 }
 interface QuestionProp {
   title: string,
   choices: ChoicesProp[],
-  errors: boolean
+  error: boolean
 }
 
 export default function Form() {
   const [formData, setFormData] = useState<FormDataProp>(
     {
       name: "",
-      errors: false,
+      error: false,
       questions: [
         {
           title: "",
-          errors: false,
+          error: false,
           choices: [
             {
               checked: true,
               description: "",
-              errors: false,
+              error: false,
             },
             {
               checked: false,
               description: "",
-              errors: false,
+              error: false,
             },
           ]
         }
@@ -66,12 +66,12 @@ export default function Form() {
     {
       checked: true,
       description: "",
-      errors: false
+      error: false
     },
     {
       checked: false,
       description: "",
-      errors: false
+      error: false
     },
   ]
 
@@ -83,7 +83,7 @@ export default function Form() {
     const prevData = [...formData.questions]
     prevData.push({
       title: "",
-      errors: false,
+      error: false,
       choices: defaultChoices
     })
 
@@ -113,7 +113,7 @@ export default function Form() {
     prevChoice.push({
       checked: false,
       description: "",
-      errors: false,
+      error: false,
     })
 
     setFormData(prevFormData => {
@@ -190,11 +190,11 @@ export default function Form() {
   const handleResetForm = () => {
     setFormData({
       name: "",
-      errors: false,
+      error: false,
       questions: [
         {
           title: "",
-          errors: false,
+          error: false,
           choices: defaultChoices
         }
       ]
@@ -300,8 +300,8 @@ export default function Form() {
                 InputProps={{ sx: { borderRadius: 2 } }}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                error={formData.errors ? true : false}
-                helperText={formData.errors
+                error={formData.error ? true : false}
+                helperText={formData.error
                   ? "Please fill in this option"
                   : ""
                 }
@@ -332,8 +332,8 @@ export default function Form() {
                   value={question.title}
                   InputProps={{ sx: { borderRadius: 2 } }}
                   onChange={(e) => handleTitleChange(questionIndex, e.target.value)}
-                  error={question.errors ? true : false}
-                  helperText={question.errors
+                  error={question.error ? true : false}
+                  helperText={question.error
                     ? "Please fill in this option"
                     : ""
                   }
@@ -379,8 +379,8 @@ export default function Form() {
                         value={choice.description}
                         InputProps={{ sx: { borderRadius: 2 } }}
                         onChange={(e) => handleDescriptionChange(questionIndex, choiceIndex, e.target.value)}
-                        error={choice.errors ? true : false}
-                        helperText={choice.errors
+                        error={choice.error ? true : false}
+                        helperText={choice.error
                           ? "Please fill in this option"
                           : ""
                         }
