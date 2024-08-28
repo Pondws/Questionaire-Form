@@ -75,10 +75,6 @@ export default function Form() {
     },
   ]
 
-  useEffect(() => {
-    console.log(formData)
-  }, [formData])
-
   const handleAddQuestion = () => {
     const prevData = [...formData.questions]
     prevData.push({
@@ -212,19 +208,19 @@ export default function Form() {
 
           return {
             ...choice,
-            errors: choiceDescriptionEmpty
+            error: choiceDescriptionEmpty
           };
         });
 
         return {
           ...question,
-          errors: questionTitleEmpty,
+          error: questionTitleEmpty,
           choices: updatedChoices
         };
       });
       return {
         ...prevFormData,
-        errors: nameEmpty,
+        error: nameEmpty,
         questions: updatedQuestions
       }
     });
@@ -233,6 +229,7 @@ export default function Form() {
   const handleSubmit = (e: any) => {
     e.preventDefault()
     validateForm()
+    console.log(formData)
   }
 
   return (
