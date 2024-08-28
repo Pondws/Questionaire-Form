@@ -172,7 +172,7 @@ export default function Form() {
   }
 
   const handleCopyQuestion = (questionIndex: number) => {
-    const copyQuestion = JSON.parse(JSON.stringify({...formData.questions[questionIndex]}));
+    const copyQuestion = JSON.parse(JSON.stringify({ ...formData.questions[questionIndex] }));
 
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -198,26 +198,27 @@ export default function Form() {
   }
 
   const validateForm = () => {
-    setFormData((prevFormData) => {
-      const nameEmpty = formData.name.trim() === ""
-      const updatedQuestions = formData.questions.map((question) => {
-        const questionTitleEmpty = question.title.trim() === "";
+    const nameEmpty = formData.name.trim() === ""
+    const updatedQuestions = formData.questions.map((question) => {
+      const questionTitleEmpty = question.title.trim() === "";
 
-        const updatedChoices = question.choices.map((choice) => {
-          const choiceDescriptionEmpty = choice.description.trim() === "";
-
-          return {
-            ...choice,
-            error: choiceDescriptionEmpty
-          };
-        });
+      const updatedChoices = question.choices.map((choice) => {
+        const choiceDescriptionEmpty = choice.description.trim() === "";
 
         return {
-          ...question,
-          error: questionTitleEmpty,
-          choices: updatedChoices
+          ...choice,
+          error: choiceDescriptionEmpty
         };
       });
+
+      return {
+        ...question,
+        error: questionTitleEmpty,
+        choices: updatedChoices
+      };
+    });
+    
+    setFormData((prevFormData) => {
       return {
         ...prevFormData,
         error: nameEmpty,
