@@ -131,7 +131,7 @@ export default function Form() {
     })
   }
 
-  const handleTitleChange = (questionIndex: number, value: any) => {
+  const handleTitleChange = (questionIndex: number, value: string) => {
     const prevQuestion = [...formData.questions]
     prevQuestion[questionIndex].title = value
 
@@ -160,7 +160,7 @@ export default function Form() {
     }))
   }
 
-  const handleDescriptionChange = (questionIndex: number, choiceIndex: number, value: any) => {
+  const handleDescriptionChange = (questionIndex: number, choiceIndex: number, value: string) => {
     const prevQuestion = [...formData.questions]
     prevQuestion[questionIndex].choices[choiceIndex].description = value
 
@@ -226,7 +226,7 @@ export default function Form() {
     });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     validateForm()
     console.log(formData)
