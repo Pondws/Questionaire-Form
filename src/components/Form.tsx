@@ -26,13 +26,11 @@ interface FormDataProp {
   questions: QuestionProp[]
 }
 interface ChoicesProp {
-  choiceId: number,
   checked: boolean,
   description: string
   errors: boolean
 }
 interface QuestionProp {
-  questionId: number,
   title: string,
   choices: ChoicesProp[],
   errors: boolean
@@ -45,18 +43,15 @@ export default function Form() {
       errors: false,
       questions: [
         {
-          questionId: Math.random(),
           title: "",
           errors: false,
           choices: [
             {
-              choiceId: Math.random(),
-              checked: false,
+              checked: true,
               description: "",
               errors: false,
             },
             {
-              choiceId: Math.random(),
               checked: false,
               description: "",
               errors: false,
@@ -67,105 +62,99 @@ export default function Form() {
     }
   )
 
+  const defaultChoices = [
+    {
+      checked: true,
+      description: "",
+      errors: false
+    },
+    {
+      checked: false,
+      description: "",
+      errors: false
+    },
+  ]
+
   useEffect(() => {
-    console.log("form Data: ", formData)
+    console.log(formData)
   }, [formData])
 
   const handleAddQuestion = () => {
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      questions: [
-        ...prevFormData.questions,
-        {
-          questionId: Math.random(),
-          title: "",
-          errors: false,
-          choices: [{
-            checked: false,
-            choiceId: Math.random(),
-            description: "",
-            errors: false,
-          },
-          {
-            checked: false,
-            choiceId: Math.random(),
-            description: "",
-            errors: false,
-          }]
-        }
-      ]
-    }))
+    const prevData = [...formData.questions]
+    prevData.push({
+      title: "",
+      errors: false,
+      choices: defaultChoices
+    })
+
+    setFormData((prevFormData) => {
+      return {
+        ...prevFormData,
+        questions: prevData
+      }
+    })
   };
 
-  const handleDeleteQuestion = (questionId: number) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: [
-        ...prevFormData.questions.filter((question) => question.questionId !== questionId)
-      ]
-    }))
+  const handleDeleteQuestion = (questionIndex: number) => {
+    const updatedQuestion = [...formData.questions]
+    updatedQuestion.splice(questionIndex, 1)
+
+    setFormData(prevFormData => {
+      return {
+        ...prevFormData,
+        questions: updatedQuestion
+      }
+    })
+  };
+
+  const handleAddChoice = (questionIndex: number) => {
+    const prevQuestion = [...formData.questions]
+    const prevChoice = prevQuestion[questionIndex].choices
+    prevChoice.push({
+      checked: false,
+      description: "",
+      errors: false,
+    })
+
+    setFormData(prevFormData => {
+      return {
+        ...prevFormData,
+      }
+    })
   }
 
-  const handleAddChoice = (questionId: number) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: [
-        ...prevFormData.questions.map((question) =>
-          question.questionId === questionId
-            ? {
-              ...question,
-              choices: [
-                ...question.choices,
-                {
-                  checked: false,
-                  choiceId: Math.random(),
-                  description: "",
-                  errors: false,
-                }
-              ]
-            } : question
-        )
-      ]
-    }))
+  const handleDeleteChoice = (questionIndex: number, choiceIndex: number) => {
+    const updatedQuestion = [...formData.questions]
+    updatedQuestion[questionIndex].choices.splice(choiceIndex, 1)
+
+    setFormData(prevFormData => {
+      return {
+        ...prevFormData,
+        questions: updatedQuestion
+      }
+    })
   }
 
-  const handleDeleteChoice = (questionId: number, choiceId: number) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: [
-        ...prevFormData.questions.map((question) =>
-          question.questionId === questionId
-            ? {
-              ...question,
-              choices: [
-                ...question.choices.filter((choice) => choice.choiceId !== choiceId)
-              ]
-            } : question
-        )
-      ]
-    }))
+  const handleTitleChange = (questionIndex: number, value: any) => {
+    const prevQuestion = [...formData.questions]
+    prevQuestion[questionIndex].title = value
+
+    setFormData((prevFormData) => {
+      return {
+        ...prevFormData,
+      }
+    })
   }
 
-  const handleQuestionChange = (questionId: number, e: any) => {
+  const handleCheckedChange = (questionIndex: number, choiceIndex: number,) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      questions: prevFormData.questions.map((question) =>
-        question.questionId === questionId
-          ? { ...question, title: e }
-          : question
-      )
-    }))
-  }
-
-  const handleCheckedChange = (questionId: number, choiceId: number) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: prevFormData.questions.map((question) =>
-        question.questionId === questionId
+      questions: prevFormData.questions.map((question, index) =>
+        index === questionIndex
           ? {
             ...question,
-            choices: question.choices.map((choice) =>
-              choice.choiceId === choiceId
+            choices: question.choices.map((choice, index) =>
+              index === choiceIndex
                 ? {
                   ...choice, checked: true,
                 } : { ...choice, checked: false }
@@ -175,35 +164,25 @@ export default function Form() {
     }))
   }
 
-  const handleDescriptionChange = (questionId: number, choiceId: number, e: any) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: prevFormData.questions.map((question) =>
-        question.questionId === questionId
-          ? {
-            ...question,
-            choices: question.choices.map((choice) =>
-              choice.choiceId === choiceId
-                ? {
-                  ...choice, description: e
-                } : choice
-            )
-          } : question
-      )
-    }))
+  const handleDescriptionChange = (questionIndex: number, choiceIndex: number, value: any) => {
+    const prevQuestion = [...formData.questions]
+    prevQuestion[questionIndex].choices[choiceIndex].description = value
+
+    setFormData((prevFormData) => {
+      return {
+        ...prevFormData,
+      }
+    })
   }
 
-  const handleCopyQuestion = (questionId: number) => {
-    const copiedQuestion = {
-      ...formData.questions.find((question) => question.questionId === questionId)
-    };
+  const handleCopyQuestion = (questionIndex: number) => {
+    const copyQuestion = JSON.parse(JSON.stringify({...formData.questions[questionIndex]}));
 
-    copiedQuestion.questionId = Math.random()
-    setFormData((prevFormData: any) => ({
+    setFormData((prevFormData) => ({
       ...prevFormData,
       questions: [
         ...prevFormData.questions,
-        copiedQuestion
+        copyQuestion
       ]
     }))
   }
@@ -214,23 +193,9 @@ export default function Form() {
       errors: false,
       questions: [
         {
-          questionId: Math.random(),
           title: "",
           errors: false,
-          choices: [
-            {
-              choiceId: Math.random(),
-              checked: false,
-              description: "",
-              errors: false,
-            },
-            {
-              choiceId: Math.random(),
-              checked: false,
-              description: "",
-              errors: false,
-            },
-          ]
+          choices: defaultChoices
         }
       ]
     })
@@ -238,8 +203,8 @@ export default function Form() {
 
   const validateForm = () => {
     setFormData((prevFormData) => {
-      const nameEmpty = prevFormData.name.trim() === ""
-      const updatedQuestions = prevFormData.questions.map((question) => {
+      const nameEmpty = formData.name.trim() === ""
+      const updatedQuestions = formData.questions.map((question) => {
         const questionTitleEmpty = question.title.trim() === "";
 
         const updatedChoices = question.choices.map((choice) => {
@@ -257,7 +222,6 @@ export default function Form() {
           choices: updatedChoices
         };
       });
-
       return {
         ...prevFormData,
         errors: nameEmpty,
@@ -345,19 +309,19 @@ export default function Form() {
             </Box>
           </CardContent>
 
-          {formData.questions.map((question, index) => (
+          {formData.questions.map((question, questionIndex) => (
             <CardContent
               sx={{
                 borderTop: "1px solid #c2c2c2",
               }}
-              key={question.questionId}
+              key={questionIndex}
             >
               <Typography component={"h6"} sx={{
                 fontWeight: "400",
                 fontSize: "20px",
                 pb: 2
               }}>
-                Question {index + 1}
+                Question {questionIndex + 1}
               </Typography>
 
               <Box sx={{ mb: 2 }}>
@@ -367,7 +331,7 @@ export default function Form() {
                   name='question'
                   value={question.title}
                   InputProps={{ sx: { borderRadius: 2 } }}
-                  onChange={(e) => handleQuestionChange(question.questionId, e.target.value)}
+                  onChange={(e) => handleTitleChange(questionIndex, e.target.value)}
                   error={question.errors ? true : false}
                   helperText={question.errors
                     ? "Please fill in this option"
@@ -377,12 +341,13 @@ export default function Form() {
               </Box>
 
               <RadioGroup>
-                {question.choices.map((choice) => (
+
+                {question.choices.map((choice, choiceIndex) => (
                   <Box
-                    key={choice.choiceId}
                     sx={{
                       display: "flex",
                     }}
+                    key={choiceIndex}
                   >
 
                     <Radio
@@ -397,7 +362,7 @@ export default function Form() {
                       name={question.title}
                       checked={choice.checked}
                       value={choice.checked}
-                      onChange={() => handleCheckedChange(question.questionId, choice.choiceId)}
+                      onChange={() => handleCheckedChange(questionIndex, choiceIndex)}
                       checkedIcon={<CheckCircleIcon style={{ fontSize: 24, color: '#00C62B' }} />}
                     />
 
@@ -413,7 +378,7 @@ export default function Form() {
                         name='description'
                         value={choice.description}
                         InputProps={{ sx: { borderRadius: 2 } }}
-                        onChange={(e) => handleDescriptionChange(question.questionId, choice.choiceId, e.target.value)}
+                        onChange={(e) => handleDescriptionChange(questionIndex, choiceIndex, e.target.value)}
                         error={choice.errors ? true : false}
                         helperText={choice.errors
                           ? "Please fill in this option"
@@ -439,7 +404,7 @@ export default function Form() {
                         alignItems: "center",
                         width: 50,
                       }}
-                      onClick={() => handleDeleteChoice(question.questionId, choice.choiceId)}
+                      onClick={() => handleDeleteChoice(questionIndex, choiceIndex)}
                     >
                       <DeleteOutlineIcon />
                     </Box>
@@ -447,6 +412,7 @@ export default function Form() {
                   </Box>
                 ))}
               </RadioGroup>
+
               <Button
                 sx={{
                   p: 0,
@@ -454,7 +420,7 @@ export default function Form() {
                   color: "#FF5C00",
                   my: 2
                 }}
-                onClick={() => handleAddChoice(question.questionId)}
+                onClick={() => handleAddChoice(questionIndex)}
               >
                 <AddIcon />
                 <Typography sx={{
@@ -476,7 +442,7 @@ export default function Form() {
                   color: "#00040C",
                   p: 0
                 }}
-                  onClick={() => handleCopyQuestion(question.questionId)}
+                  onClick={() => handleCopyQuestion(questionIndex)}
                 >
                   <ContentCopyIcon />
                   <Typography sx={{
@@ -491,7 +457,7 @@ export default function Form() {
                   p: 0,
                   ml: 2
                 }}
-                  onClick={() => handleDeleteQuestion(question.questionId)}
+                  onClick={() => handleDeleteQuestion(questionIndex)}
                 >
                   <DeleteOutlineIcon />
                   <Typography sx={{
