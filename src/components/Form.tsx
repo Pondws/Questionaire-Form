@@ -217,7 +217,7 @@ export default function Form() {
         choices: updatedChoices
       };
     });
-    
+
     setFormData((prevFormData) => {
       return {
         ...prevFormData,
@@ -285,11 +285,12 @@ export default function Form() {
         <Card sx={{ m: 3 }}>
           <CardContent>
             <Box>
-              <Typography component={"h6"} sx={{
-                fontWeight: "400",
-                fontSize: "20px",
-                mb: 2
-              }}>
+              <Typography component={"h6"}
+                sx={{
+                  fontWeight: "400",
+                  fontSize: "20px",
+                  mb: 2
+                }}>
                 Questionnaire Detail
               </Typography>
               <TextField
