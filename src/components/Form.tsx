@@ -121,7 +121,10 @@ export default function Form() {
 
   const handleDeleteChoice = (questionIndex: number, choiceIndex: number) => {
     const updatedQuestion = [...formData.questions]
-    updatedQuestion[questionIndex].choices.splice(choiceIndex, 1)
+    
+    if (updatedQuestion[questionIndex].choices.length > 2 && updatedQuestion[questionIndex].choices[choiceIndex].checked === false) {
+      updatedQuestion[questionIndex].choices.splice(choiceIndex, 1)
+    }
 
     setFormData(prevFormData => {
       return {
